@@ -5,7 +5,7 @@ import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
 import { Component } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 
-const url="https://crudcrud.com/api/41d90f227c6843c8ae8e3da5a651e0ce";
+const url="https://crudcrud.com/api/41d90f227c6843c8ae8e3da5a651e0ce/unicorns";
 
 class App extends Component {
 state ={
@@ -13,7 +13,7 @@ state ={
 }
   getMethod=()=>{
     axios.get(url).then(response=>{
-      console.log(response.data);
+      this.setState({data: response.data});
     })
   }
   componentDidMount(){
@@ -23,20 +23,26 @@ state ={
     return (
       <div className="App">
         <br/>
-        <button className="btn btn-success">Agregar Empresa</button>
+        <button className="btn btn-success">Add unicorn</button>
         <br/> <br/>
         <table className="table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Pais</th>
-              <th>Capital</th>
-              <th>Acciones</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Colour</th>
             </tr>
           </thead>
           <tbody>
-
+              {this.state.data.map(unicorns=>{
+                return(
+                  <tr>
+                  <td>{unicorns.name}</td>
+                  <td>{unicorns.age}</td>
+                  <td>{unicorns.colour}</td>
+                  </tr>
+                )
+              })}
           </tbody>
         </table>
       </div>
