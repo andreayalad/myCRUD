@@ -14,7 +14,8 @@ state ={
   form:{
     name:'',
     age:'',
-    colour:''
+    colour:'',
+    modalType: ''
   }
 }
 
@@ -25,6 +26,7 @@ state ={
   }
 
   postMethod=async()=>{
+    delete this.state.form.name;
     await axios.post(url, this.state.form).then(response=>{
       this.modalInsert();
       this.getMethod();
@@ -32,8 +34,25 @@ state ={
       console.log(error.message)
     })
   }
+
+  patchMethod=()=>{
+    axios.put(url+this.state.form.name, this.state.form).then(response=>{
+      this.modalInsert();
+      this.getMethod();
+    })
+  }  
   modalInsert=()=>{
     this.setState({modalInsert: !this.state.modalInsert});
+  }
+  selectUnicorn=(unicorns)=>{
+    this.setState({
+      modalType: 'update',
+      form:{
+        name: unicorns.name,
+        age: unicorns.age,
+        colour: unicorns.colour
+      }
+    })
   }
 
   handleChange=async e=>{
@@ -55,7 +74,7 @@ state ={
     return (
       <div className="App">
         <br/>
-        <button className="btn btn-success" onClick={()=>this.modalInsert()}>Add unicorn</button>
+        <button className="btn btn-success" onClick={()=>{this.setState({form:null, modalType:'add'}); this.modalInsert()}}>Add unicorn</button>
         <br/> <br/>
         <table className="table">
           <thead>
@@ -72,11 +91,16 @@ state ={
                   <td>{unicorns.name}</td>
                   <td>{unicorns.age}</td>
                   <td>{unicorns.colour}</td>
+                  <td>
+                    <button className="btn btn-primary" onClick={()=>{this.selectUnicorn(unicorns); this.modalInsert()}  }>Edit</button>
+                    <button className="btn btn-danger">Delete</button>
+                  </td>
                   </tr>
                 )
               })}
           </tbody>
         </table>
+
         <Modal isOpen={this.state.modalInsert}>
           <ModalHeader style={{display: 'block'}}>
               <span style={{float: 'right'}}>x</span>
@@ -84,20 +108,26 @@ state ={
           <ModalBody>
             <div className="form-group">
               <label htmlFor="name">Name</label>
-              <input className="form-control" type="text" name="name"  onChange={this.handleChange} value={form.name}/>
+              <input className="form-control" type="text" name="name"  onChange={this.handleChange} value={form?form.name: ''}/>
               <br/>
               <label htmlFor="age">Age</label>
-              <input className="form-control" type="number" name="age"  onChange={this.handleChange} value={form.age}/>
+              <input className="form-control" type="number" name="age"  onChange={this.handleChange} value={form?form.age: ''}/>
               <br/>
               <label htmlFor="colour">Colour</label>
-              <input className="form-control" type="text" name="colour"  onChange={this.handleChange} value={form.colour}/>
+              <input className="form-control" type="text" name="colour"  onChange={this.handleChange} value={form?form.colour: ''}/>
               <br/>
             </div>
           </ModalBody>
+
           <ModalFooter>
-            <button className="btn btn-success" onClick={()=>this.postMethod()}>
-              Add New
-            </button>
+            {this.state.modalType=='add'?
+             <button className="btn btn-success" onClick={()=>this.postMethod()}>
+             Add New
+             </button>: <button className="btn btn-primary" onClick={()=>this.patchMethod()}>
+               Edit
+             </button>
+            }
+           
             <button className="btn btn-danger" onClick={()=>this.modalInsert()}>Cancel</button>
           </ModalFooter>
         </Modal>
